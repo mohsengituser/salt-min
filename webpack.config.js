@@ -1,13 +1,14 @@
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const path = require('path');
 
 module.exports = {
-    entry: './src/index.js', // Entry point for your file
+    entry: './src/index.js',
     output: {
         path: path.resolve(__dirname, 'dist'),
-        filename: 'salt-ds-core.min.js', // Minified output file
-        library: 'SaltDSCore', // Global variable name for the library
-        libraryTarget: 'umd', // Universal Module Definition
-        globalObject: 'this', // Ensures compatibility in various environments
+        filename: 'salt-ds-core.min.js',
+        library: 'SaltDSCore',
+        libraryTarget: 'umd',
+        globalObject: 'this',
     },
     module: {
         rules: [
@@ -17,19 +18,31 @@ module.exports = {
                 use: {
                     loader: 'babel-loader',
                     options: {
-                        presets: ['@babel/preset-env', '@babel/preset-react'], // Transpile modern JavaScript and JSX
+                        presets: [
+                            ['@babel/preset-env', { modules: false }],
+                            ['@babel/preset-react', { runtime: 'automatic' }],
+                        ],
                     },
                 },
             },
+            {
+                test: /\.css$/,
+                use: [MiniCssExtractPlugin.loader, 'css-loader'], // Extract CSS to a separate file
+            },
         ],
     },
+    plugins: [
+        new MiniCssExtractPlugin({
+            filename: 'salt-ds-core.min.css', // Extracted CSS file
+        }),
+    ],
     resolve: {
         extensions: ['.js', '.jsx'],
     },
-    mode: 'production', // Minifies the output
+    mode: 'production',
     externals: {
-        react: 'React', // External React
-        'react-dom': 'ReactDOM', // External ReactDOM
-        'react/jsx-runtime': 'react/jsx-runtime', // External JSX runtime
-    }    
+        react: 'React',
+        'react-dom': 'ReactDOM',
+        'react/jsx-runtime': 'react/jsx-runtime',
+    },
 };
